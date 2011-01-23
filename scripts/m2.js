@@ -14,7 +14,8 @@ M2.prototype = {
 	},
 
 	parse: function (data) {
-		var reader = new BinaryReader(data);
+//		var reader = BinaryReader(data);
+		var reader = new cDataView(data);
 		var parser = new BinaryParser(reader, this.description, this);
 		this.pushRequest();
 		this.model = parser.parse(this.description_entry);
@@ -50,7 +51,7 @@ M2.prototype = {
 
 		struct: function (config, type) {
 			var nofs = config.parse('nofs');
-			var pos = config.binaryReader.getPosition();
+			var pos = config.binaryReader.tell();
 			config.binaryReader.seek(nofs.offset);
 			if (type === 'char') {
 				var result = config.parse(['string0', nofs.count]);
@@ -153,6 +154,7 @@ M2.prototype = {
 			var num = config.parse('uint32');
 			var views = [];
 			var that = this;
+			num = 1; // fix
 			for (var i = 0; i < num; ++i) {
 				this.pushRequest();
 				var filename = this.filename.replace(/\.m2$/, '0' + i + '.skin');

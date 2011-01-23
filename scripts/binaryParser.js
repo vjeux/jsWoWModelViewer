@@ -17,15 +17,15 @@ var BinaryParser = function (binaryReader, description, caller) {
 };
 
 BinaryParser.stdDescription = {
-	uint8:	function (config) { return config.binaryReader.readUInt8.call(config.binaryReader); },
-	int8:	function (config) { return config.binaryReader.readInt8.call(config.binaryReader); },
-	uint16: function (config) { return config.binaryReader.readUInt16.call(config.binaryReader); },
-	int16:	function (config) { return config.binaryReader.readInt16.call(config.binaryReader); },
-	uint32: function (config) { return config.binaryReader.readUInt32.call(config.binaryReader); },
-	int32:	function (config) { return config.binaryReader.readInt32.call(config.binaryReader); },
-	float:	function (config) { return config.binaryReader.readFloat.call(config.binaryReader); },
-	char:	function (config) { return config.binaryReader.readChar.call(config.binaryReader); },
-	string: function (config, size) { return config.parse(['array', 'char', size]).join(''); },
+	uint8:	function (config) { return config.binaryReader.getUint8.call(config.binaryReader, undefined, true); },
+	int8:	function (config) { return config.binaryReader.getInt8.call(config.binaryReader,  undefined, true); },
+	uint16: function (config) { return config.binaryReader.getUint16.call(config.binaryReader, undefined, true); },
+	int16:	function (config) { return config.binaryReader.getInt16.call(config.binaryReader, undefined, true); },
+	uint32: function (config) { return config.binaryReader.getUint32.call(config.binaryReader, undefined, true); },
+	int32:	function (config) { return config.binaryReader.getInt32.call(config.binaryReader, undefined, true); },
+	float:	function (config) { return config.binaryReader.getFloat32.call(config.binaryReader, undefined, true); },
+	char:	function (config) { return config.binaryReader.getChar.call(config.binaryReader, undefined, true); },
+	string: function (config, size) { return config.binaryReader.getString.call(config.binaryReader, undefined, size); },
 	array:	function (config, type, number) {
 		var num_type = typeof number;
 		var k = num_type === 'number' ? number
