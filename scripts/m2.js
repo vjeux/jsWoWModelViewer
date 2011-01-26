@@ -14,8 +14,7 @@ M2.prototype = {
 	},
 
 	parse: function (data) {
-//		var reader = BinaryReader(data);
-		var reader = new cDataView(data);
+		var reader = new jDataView(data);
 		var parser = new BinaryParser(reader, this.description, this);
 		this.pushRequest();
 		this.model = parser.parse(this.description_entry);

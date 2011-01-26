@@ -25,7 +25,7 @@ BinaryParser.stdDescription = {
 	int32:	function (config) { return config.binaryReader.getInt32.call(config.binaryReader, undefined, true); },
 	float:	function (config) { return config.binaryReader.getFloat32.call(config.binaryReader, undefined, true); },
 	char:	function (config) { return config.binaryReader.getChar.call(config.binaryReader, undefined, true); },
-	string: function (config, size) { return config.binaryReader.getString.call(config.binaryReader, undefined, size); },
+	string: function (config, size) { return config.binaryReader.getString.call(config.binaryReader, size); },
 	array:	function (config, type, number) {
 		var num_type = typeof number;
 		var k = num_type === 'number' ? number
