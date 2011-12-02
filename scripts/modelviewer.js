@@ -46,7 +46,7 @@ ModelViewer.prototype = {
 
 		perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
 		loadIdentity();
-	 
+
 		multMatrix(makeLookAt(
 			TRANSLATE[0], TRANSLATE[1], TRANSLATE[2],
 			ROTATE[0], ROTATE[1], ROTATE[2],
@@ -81,7 +81,7 @@ ModelViewer.prototype = {
 		this.createGLModel();
 
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
-		gl.clearDepth(1.0);	 
+		gl.clearDepth(1.0);
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.LEQUAL);
 
@@ -130,7 +130,7 @@ ModelViewer.prototype = {
 		this.createTexture('assets/Item/Objectcomponents/weapon/axe_1h_blacksmithing_d_01.png');
 //		this.createTexture('assets/Creature/Arthaslichking/ARTHASLICHKING_V2_01.png');
 	},
-	
+
 	createTexture: function (path) {
 		var that = this;
 
@@ -152,7 +152,11 @@ ModelViewer.prototype = {
 
 	parse: function (data) {
 		this.model = data;
-		console.log(data);
+		if (typeof console !== 'undefined') {
+			console.log('Parsed Model', data);
+			$('textarea')
+				.html(JSON.stringify(data, null, 2));
+		}
 		this.glStart();
 	}
 };
