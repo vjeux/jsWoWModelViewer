@@ -11,7 +11,10 @@ M2.prototype = {
 	load: function (filename) {
 		var that = this;
 //		console.log(filename);
-		$.get(filename, function (data) { that.parse(data); }, 'dataview');
+		$.get(filename, function (data) { 
+			data._littleEndian = true;
+			that.parse(data); 
+		}, 'dataview');
 	},
 
 	parse: function (data) {
