@@ -1,68 +1,31 @@
-
-ROTATE = $V([0.2, 3.2, 0.2]);
-TRANSLATE = $V([0.0, -1.0, -0.2]);
-ANGLE = 0;
-
 var ModelViewer = function (opt) {
 	this.opt = opt;
 	this.width = window.innerWidth;
 	this.height = window.innerHeight;
+	
+	this.pMatrix = mat4.create();
+	this.mvMatrix = mat4.create();
+	
+	this.eye = vec3.create([0.0, -1.0, -0.2]);
+	this.center = vec3.create([0.2, 3.2, 0.2]);
+	this.up = vec3.create([0, 0, 1]);
+	
+	this.angle = 0;
 
 	var that = this;
 	new M2(opt.file, function (model) { that.parse(model); });
 };
 
 ModelViewer.prototype = {
-	perspective: function (fov, aspect, near, far) {
-		var top = near * Math.tan(fov * Math.PI / 360.0),
-			bottom = -top,
-    		left = bottom * aspect,
-    		right = top * aspect,
-    		X = 2*near/(right-left),
-	    	Y = 2*near/(top-bottom),
-	    	A = (right+left)/(right-left),
-	    	B = (top+bottom)/(top-bottom),
-	    	C = -(far+near)/(far-near),
-	    	D = -2*far*near/(far-near);
-
-	    this.pMatrix = $M([[X,  0,  A,  0],
-        	       		   [0,  Y,  B,  0],
-            	   		   [0,  0,  C,  D],
-               			   [0,  0, -1,  0]]);
-	},
-	lookAt: function (eye, center, up) {
-		var z = eye.subtract(center).toUnitVector();
-	    var x = up.cross(z).toUnitVector();
-	    var y = z.cross(x).toUnitVector();
-
-	    var m = $M([[x.e(1), x.e(2), x.e(3), 0],
-	                [y.e(1), y.e(2), y.e(3), 0],
-	                [z.e(1), z.e(2), z.e(3), 0],
-	                [0, 0, 0, 1]]);
-
-	    var t = $M([[1, 0, 0, -eye.e(1)],
-	                [0, 1, 0, -eye.e(2)],
-	                [0, 0, 1, -eye.e(3)],
-	                [0, 0, 0, 1]]);
-	    this.mvMatrix = this.mvMatrix.x( m.x(t) );
-	},
-	loadIdentity: function () {
-		this.mvMatrix = Matrix.I(4);
-	},
-	rotate: function (angle, v) {
-		var arad = angle * Math.PI / 180.0;
-		var m = Matrix.Rotation(arad, v).ensure4x4();
-		this.mvMatrix = this.mvMatrix.x(m);
-	},
 	drawScene: function () {
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-		this.perspective(45, this.width / this.height, 0.1, 100.0);
-		this.loadIdentity();
+		mat4.perspective(45, this.width / this.height, 0.1, 100.0, this.pMatrix);
+		mat4.identity(this.mvMatrix);
 
-		this.lookAt( TRANSLATE, ROTATE, $V([0, 0, 1]) );
+		mat4.lookAt(this.eye, this.center, this.up, this.mvMatrix);
 
-		this.rotate( ANGLE, $V([0,0,1]) )
+		mat4.rotateZ(this.mvMatrix, this.angle);
 
 		// Vertex
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.glModel);
@@ -84,7 +47,7 @@ ModelViewer.prototype = {
 		this.setMatrixUniforms();
 		this.gl.drawElements(this.gl.TRIANGLES, this.glVertexIndexBuffer.numItems, this.gl.UNSIGNED_SHORT, 0);
 
-		ANGLE++;
+		this.angle += 0.01;
 
 	},
 
@@ -160,8 +123,8 @@ ModelViewer.prototype = {
 	},
 
 	setMatrixUniforms: function () {
-		this.gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, new Float32Array(this.pMatrix.flatten()));
-		this.gl.uniformMatrix4fv(this.shaderProgram.mvMatrixUniform, false, new Float32Array(this.mvMatrix.flatten()));
+		this.gl.uniformMatrix4fv(this.shaderProgram.pMatrixUniform, false, new Float32Array(this.pMatrix));
+		this.gl.uniformMatrix4fv(this.shaderProgram.mvMatrixUniform, false, new Float32Array(this.mvMatrix));
 	},
 
 	glStart: function () {
