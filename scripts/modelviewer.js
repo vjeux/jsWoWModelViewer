@@ -1,3 +1,29 @@
+(function() {
+    var lastTime = 0,
+        vendors = ['ms', 'moz', 'webkit', 'o'],
+        x, length, currTime, timeToCall;
+
+    for(x = 0, length = vendors.length; x < length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+        window.cancelAnimationFrame = 
+          window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame)
+        window.requestAnimationFrame = function(callback, element) {
+            currTime = new Date().getTime();
+            timeToCall = Math.max(0, 16 - (currTime - lastTime));
+            lastTime = currTime + timeToCall;
+            return window.setTimeout(function() { callback(currTime + timeToCall); }, 
+              timeToCall);
+        };
+
+    if (!window.cancelAnimationFrame)
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+}());
+
 var ModelViewer = function (opt) {
 	this.opt = opt;
 	this.width = window.innerWidth;
@@ -140,11 +166,12 @@ ModelViewer.prototype = {
 		this.gl.clearDepth(1.0);
 		this.gl.enable(this.gl.DEPTH_TEST);
 		this.gl.depthFunc(this.gl.LEQUAL);
-
-		this.gl.viewport(0, 0, this.width, this.height);
-
+	},
+	
+	render: function () {
 		var that = this;
-		setInterval(function () { that.drawScene(); }, 15);
+		this.drawScene();
+		window.requestAnimationFrame(function () { that.render() });
 	},
 
 	createGLModel: function () {
@@ -195,6 +222,7 @@ ModelViewer.prototype = {
 		this.texture.image = new Image();
 		this.texture.image.onload = function () {
 			that.handleLoadedTexture(that.texture);
+			that.render.call(that);
 		}
 		this.texture.image.src = path;
 	},
