@@ -8,7 +8,6 @@
 <!-- WebGL Libs -->
 	<script src="scripts/sylvester.js"></script>
 	<script src="scripts/glUtils.js"></script>
-	<script src="scripts/glUtilities.js"></script>
 
 <!-- Main -->
 	<script src="scripts/m2.js"></script>
@@ -50,34 +49,20 @@ void main(void) {
 </script>
  
 <style>
-fieldset { display: inline-block; }
+	body {
+		margin: 0
+	}
+
+	#gl {
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
 </style>
 </head>
 <body>
 
-<button onclick="stop = true;">Stop</button>
-<fieldset id="translate">
-<legend>Camera</legend>
-<section>X: <input type="range" min="-10" max="10" value="0" step="0.1" /> <span></span></section>
-<section>Y: <input type="range" min="-10" max="10" value="-1" step="0.1" /> <span></span></section>
-<section>Z: <input type="range" min="-10" max="10" value="-0.2" step="0.1" /> <span></span></section>
-</fieldset>
-
-<fieldset id="rotate">
-<legend>Look At</legend>
-<section>X: <input type="range" min="-10" max="10" value="0.2" step="0.1" /> <span></span></section>
-<section>Y: <input type="range" min="-10" max="10" value="3.2" step="0.1" /> <span></span></section>
-<section>Z: <input type="range" min="-10" max="10" value="0.2" step="0.1" /> <span></span></section>
-</fieldset>
-
-<br />
-
-<canvas id="glSurface" style="border: none;" width="500" height="500"></canvas> 
-
-<br />
-Open the console (firebug, web inspector ...) to view the parsed model.
-
-<textarea></textarea>
+<canvas id="gl"></canvas> 
 
 </body>
 </html>
