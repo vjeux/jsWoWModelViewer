@@ -36,9 +36,14 @@ var ModelViewer = function (opt) {
 	this.center = vec3.create([0.2, 3.2, 0.2]);
 	this.up = vec3.create([0, 0, 1]);
 	
+	this.stopped = false;
+	
 	this.angle = 0;
 
 	var that = this;
+	document.getElementById('play').addEventListener('click', function () {
+		that.stopped && that.start.call(that) || that.stop.call(that);
+	});
 	new M2(opt.file, function (model) { that.parse(model); });
 };
 
@@ -75,13 +80,14 @@ ModelViewer.prototype = {
 
 		this.angle += 0.01;
 
+		var that = this;
+		this.stopped || window.requestAnimationFrame(function () { that.drawScene() });
 	},
 
 	initGL: function (canvas) {
 		try {
 		  this.gl = canvas.getContext("experimental-webgl");
-		} catch(e) {
-		}
+		} catch(e) {}
 		if (!this.gl) {
 		  alert("Could not initialise WebGL, sorry :-(");
 		}
@@ -168,12 +174,19 @@ ModelViewer.prototype = {
 		this.gl.depthFunc(this.gl.LEQUAL);
 	},
 	
-	render: function () {
-		var that = this;
+	start: function () {
+		this.stopped = false;
 		this.drawScene();
-		window.requestAnimationFrame(function () { that.render() });
+		document.getElementById('play').setAttribute('class', 'icon-pause');
+		return true;
 	},
-
+	
+	stop: function () {
+		this.stopped = true;
+		document.getElementById('play').setAttribute('class', 'icon-play');
+		return true;
+	},
+	
 	createGLModel: function () {
 		/* Vertex */
 		var vertices = [];
@@ -222,7 +235,7 @@ ModelViewer.prototype = {
 		this.texture.image = new Image();
 		this.texture.image.onload = function () {
 			that.handleLoadedTexture(that.texture);
-			that.render.call(that);
+			that.start.call(that);
 		}
 		this.texture.image.src = path;
 	},

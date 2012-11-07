@@ -48,8 +48,56 @@ void main(void) {
 </script>
  
 <style>
+	@font-face {
+	  font-family: 'buttons';
+	  	src: url("./font/buttons.eot");
+	  	src: url("./font/buttons.eot?#iefix") format('embedded-opentype'), url("./font/buttons.woff") format('woff'), url("./font/buttons.ttf") format('truetype'), url("./font/buttons.svg#buttons") format('svg');
+	  	font-weight: normal;
+	  	font-style: normal;
+	}
+	[class^="icon-"]:before,
+	[class*=" icon-"]:before {
+	  	font-family: 'buttons';
+	  	font-style: normal;
+	  	font-weight: normal;
+	  	speak: none;
+	  	display: inline-block;
+	  	text-decoration: inherit;
+	  	width: 1em;
+	  	margin-right: 0.2em;
+	  	text-align: center;
+	/* Uncomment for 3D effect */
+		text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3);
+	/* fix buttons height */
+	  	line-height: 1em;
+	/* you can be more comfortable with increased icons size */
+	/* font-size: 120%; */
+	}
+	
+	.icon-pause:before { 
+		content: '\e801';
+		padding: 7px 6px 7px 7px;
+	}
+	.icon-play:before { 
+		content: '\e800';
+		padding: 7px 5px 7px 8px;
+	}
+
 	body {
 		margin: 0
+	}
+
+	#play {
+		position: absolute;
+		left: 10px;
+		top: 10px;
+		color: #eee;
+		border: 1px solid #eee;
+		background: transparent;
+		display: inline-block;
+		border-radius: 3px;
+		padding: 0;
+		cursor: pointer;
 	}
 
 	#gl {
@@ -61,7 +109,8 @@ void main(void) {
 </head>
 <body>
 
-<canvas id="gl"></canvas> 
+	<button id="play" class="icon-play"></button>
+	<canvas id="gl"></canvas> 
 
 </body>
 </html>
