@@ -6,9 +6,7 @@
 	<script src="https://raw.github.com/vjeux/jParser/master/src/jparser.js"></script>
 
 <!-- WebGL Libs -->
-	<script src="scripts/sylvester.js"></script>
-	<script src="scripts/glUtils.js"></script>
-	<script src="scripts/glUtilities.js"></script>
+	<script src="scripts/gl-matrix.js"></script>
 
 <!-- Main -->
 	<script src="scripts/m2.js"></script>
@@ -50,34 +48,69 @@ void main(void) {
 </script>
  
 <style>
-fieldset { display: inline-block; }
+	@font-face {
+	  font-family: 'buttons';
+	  	src: url("./font/buttons.eot");
+	  	src: url("./font/buttons.eot?#iefix") format('embedded-opentype'), url("./font/buttons.woff") format('woff'), url("./font/buttons.ttf") format('truetype'), url("./font/buttons.svg#buttons") format('svg');
+	  	font-weight: normal;
+	  	font-style: normal;
+	}
+	[class^="icon-"]:before,
+	[class*=" icon-"]:before {
+	  	font-family: 'buttons';
+	  	font-style: normal;
+	  	font-weight: normal;
+	  	speak: none;
+	  	display: inline-block;
+	  	text-decoration: inherit;
+	  	width: 1em;
+	  	margin-right: 0.2em;
+	  	text-align: center;
+	/* Uncomment for 3D effect */
+		text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3);
+	/* fix buttons height */
+	  	line-height: 1em;
+	/* you can be more comfortable with increased icons size */
+	/* font-size: 120%; */
+	}
+	
+	.icon-pause:before { 
+		content: '\e801';
+		padding: 7px 6px 7px 7px;
+	}
+	.icon-play:before { 
+		content: '\e800';
+		padding: 7px 5px 7px 8px;
+	}
+
+	body {
+		margin: 0
+	}
+
+	#play {
+		position: absolute;
+		left: 10px;
+		top: 10px;
+		color: #eee;
+		border: 1px solid #eee;
+		background: transparent;
+		display: inline-block;
+		border-radius: 3px;
+		padding: 0;
+		cursor: pointer;
+	}
+
+	#gl {
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
 </style>
 </head>
 <body>
 
-<button onclick="stop = true;">Stop</button>
-<fieldset id="translate">
-<legend>Camera</legend>
-<section>X: <input type="range" min="-10" max="10" value="0" step="0.1" /> <span></span></section>
-<section>Y: <input type="range" min="-10" max="10" value="-1" step="0.1" /> <span></span></section>
-<section>Z: <input type="range" min="-10" max="10" value="-0.2" step="0.1" /> <span></span></section>
-</fieldset>
-
-<fieldset id="rotate">
-<legend>Look At</legend>
-<section>X: <input type="range" min="-10" max="10" value="0.2" step="0.1" /> <span></span></section>
-<section>Y: <input type="range" min="-10" max="10" value="3.2" step="0.1" /> <span></span></section>
-<section>Z: <input type="range" min="-10" max="10" value="0.2" step="0.1" /> <span></span></section>
-</fieldset>
-
-<br />
-
-<canvas id="glSurface" style="border: none;" width="500" height="500"></canvas> 
-
-<br />
-Open the console (firebug, web inspector ...) to view the parsed model.
-
-<textarea></textarea>
+	<button id="play" class="icon-play"></button>
+	<canvas id="gl"></canvas> 
 
 </body>
 </html>
