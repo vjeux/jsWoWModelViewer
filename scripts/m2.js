@@ -1,4 +1,3 @@
-
 var M2 = function (filename, callback, description_entry) {
 	this.filename = filename;
 	this.callback = callback;
@@ -128,7 +127,6 @@ M2.prototype = {
 		views: jBinary.Type({
 			read: function () {
 				var m2 = this.binary.getContext(1);
-				console.log(m2);
 				var num = this.binary.read('uint32');
 				var views = [];
 				num = 1; // fix
