@@ -24,7 +24,7 @@
 			clearTimeout(id);
 		};
 	}
-}());
+})();
 
 var ModelViewer = function (opt) {
 	this.opt = opt;
@@ -185,6 +185,8 @@ ModelViewer.prototype = {
 		this.gl.clearDepth(1.0);
 		this.gl.enable(this.gl.DEPTH_TEST);
 		this.gl.depthFunc(this.gl.LEQUAL);
+
+		this.drawScene();
 	},
 	
 	start: function () {
@@ -268,6 +270,5 @@ ModelViewer.prototype = {
 			console.log('Parsed Model', data);
 		}
 		this.glStart();
-		this.drawScene();
 	}
 };
