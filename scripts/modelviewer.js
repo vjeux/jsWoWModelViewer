@@ -55,7 +55,6 @@ var ModelViewer = function (opt) {
 		that.stopped && that.start() || that.stop();
 	});
 	new M2(opt.file, function (model) { that.parse(model); });
-	this.drawScene();
 };
 
 ModelViewer.prototype = {
@@ -267,5 +266,6 @@ ModelViewer.prototype = {
 			console.log('Parsed Model', data);
 		}
 		this.glStart();
+		this.drawScene();
 	}
 };
