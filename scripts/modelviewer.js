@@ -52,9 +52,10 @@ var ModelViewer = function (opt) {
 
 	var that = this;
 	opt.playBtn.addEventListener('click', function () {
-		that.stopped && that.start.call(that) || that.stop.call(that);
+		that.stopped && that.start() || that.stop();
 	});
 	new M2(opt.file, function (model) { that.parse(model); });
+	this.drawScene();
 };
 
 ModelViewer.prototype = {
@@ -188,7 +189,6 @@ ModelViewer.prototype = {
 	start: function () {
 		this.stopped = false;
 		this.angleSpeed.Z = 0.01;
-		this.drawScene();
 		this.opt.playBtn.setAttribute('class', 'icon-pause');
 		return true;
 	},
