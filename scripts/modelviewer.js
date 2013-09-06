@@ -41,7 +41,7 @@ var ModelViewer = function (opt) {
 	this.angle = 0;
 
 	var that = this;
-	document.getElementById('play').addEventListener('click', function () {
+	opt.playBtn.addEventListener('click', function () {
 		that.stopped && that.start.call(that) || that.stop.call(that);
 	});
 	new M2(opt.file, function (model) { that.parse(model); });
@@ -177,13 +177,13 @@ ModelViewer.prototype = {
 	start: function () {
 		this.stopped = false;
 		this.drawScene();
-		document.getElementById('play').setAttribute('class', 'icon-pause');
+		this.opt.playBtn.setAttribute('class', 'icon-pause');
 		return true;
 	},
 	
 	stop: function () {
 		this.stopped = true;
-		document.getElementById('play').setAttribute('class', 'icon-play');
+		this.opt.playBtn.setAttribute('class', 'icon-play');
 		return true;
 	},
 	
@@ -252,15 +252,14 @@ ModelViewer.prototype = {
 		this.model = data;
 		if (typeof console !== 'undefined') {
 			console.log('Parsed Model', data);
-			$('textarea')
-				.html(JSON.stringify(data, null, 2));
 		}
 		this.glStart();
 	}
 };
 
-$(function () {
-	model = new ModelViewer({
-		file: 'assets/Item/Objectcomponents/weapon/axe_1h_blacksmithing_d_01.m2'
+addEventListener('load', function () {
+	new ModelViewer({
+		file: 'assets/Item/Objectcomponents/weapon/axe_1h_blacksmithing_d_01.m2',
+		playBtn: document.getElementById('play')
 	});
 });
