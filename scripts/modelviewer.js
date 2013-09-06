@@ -1,28 +1,28 @@
 (function() {
-    var lastTime = 0,
-        vendors = ['ms', 'moz', 'webkit', 'o'],
-        x, length, currTime, timeToCall;
+	var lastTime = 0,
+	vendors = ['ms', 'moz', 'webkit', 'o'],
+	x, length, currTime, timeToCall;
 
-    for(x = 0, length = vendors.length; x < length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = 
-          window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
-    }
+	for(x = 0, length = vendors.length; x < length && !window.requestAnimationFrame; ++x) {
+		window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+		window.cancelAnimationFrame = 
+		window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+	}
 
-    if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback, element) {
-            currTime = new Date().getTime();
-            timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            lastTime = currTime + timeToCall;
-            return window.setTimeout(function() { callback(currTime + timeToCall); }, 
-              timeToCall);
-        };
+	if (!window.requestAnimationFrame)
+		window.requestAnimationFrame = function(callback, element) {
+			currTime = new Date().getTime();
+			timeToCall = Math.max(0, 16 - (currTime - lastTime));
+			lastTime = currTime + timeToCall;
+			return window.setTimeout(function() { callback(currTime + timeToCall); }, 
+				timeToCall);
+		};
 
-    if (!window.cancelAnimationFrame)
-        window.cancelAnimationFrame = function(id) {
-            clearTimeout(id);
-        };
-}());
+		if (!window.cancelAnimationFrame)
+			window.cancelAnimationFrame = function(id) {
+				clearTimeout(id);
+			};
+		}());
 
 var ModelViewer = function (opt) {
 	this.opt = opt;
@@ -32,13 +32,23 @@ var ModelViewer = function (opt) {
 	this.pMatrix = mat4.create();
 	this.mvMatrix = mat4.create();
 	
-	this.eye = vec3.create([0.0, -1.0, -0.1]);
+	this.eye = vec3.create([0.0, -1.5, -0.1]);
 	this.center = vec3.create([0.2, 3.2, 0.2]);
 	this.up = vec3.create([0, 0, 1]);
 	
 	this.stopped = false;
 	
-	this.angle = 0;
+	this.angle = {
+		X: 0,
+		Y: 0,
+		Z: 0
+	};
+
+	this.angleSpeed = {
+		X: 0,
+		Y: 0,
+		Z: 0.01
+	};
 
 	var that = this;
 	opt.playBtn.addEventListener('click', function () {
@@ -56,7 +66,10 @@ ModelViewer.prototype = {
 
 		mat4.lookAt(this.eye, this.center, this.up, this.mvMatrix);
 
-		mat4.rotateZ(this.mvMatrix, this.angle);
+		for (var name in this.angle) {
+			mat4['rotate' + name](this.mvMatrix, this.angle[name]);
+			this.angle[name] += this.angleSpeed[name];
+		}
 
 		// Vertex
 		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.glModel);
@@ -78,51 +91,49 @@ ModelViewer.prototype = {
 		this.setMatrixUniforms();
 		this.gl.drawElements(this.gl.TRIANGLES, this.glVertexIndexBuffer.numItems, this.gl.UNSIGNED_SHORT, 0);
 
-		this.angle += 0.01;
-
 		var that = this;
-		this.stopped || window.requestAnimationFrame(function () { that.drawScene() });
+		window.requestAnimationFrame(function () { that.drawScene() });
 	},
 
 	initGL: function (canvas) {
 		try {
-		  this.gl = canvas.getContext("experimental-webgl");
+			this.gl = canvas.getContext("experimental-webgl");
 		} catch(e) {}
 		if (!this.gl) {
-		  alert("Could not initialise WebGL, sorry :-(");
+			alert("Could not initialise WebGL, sorry :-(");
 		}
 	},
 
 	getShader: function (gl, id) {
 		var shaderScript = document.getElementById(id);
 		if (!shaderScript) {
-		  return null;
+			return null;
 		}
 
 		var str = "";
 		var k = shaderScript.firstChild;
 		while (k) {
-		  if (k.nodeType == 3) {
-		    str += k.textContent;
-		  }
-		  k = k.nextSibling;
+			if (k.nodeType == 3) {
+				str += k.textContent;
+			}
+			k = k.nextSibling;
 		}
 
 		var shader;
 		if (shaderScript.type == "x-shader/x-fragment") {
-		  shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
+			shader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
 		} else if (shaderScript.type == "x-shader/x-vertex") {
-		  shader = this.gl.createShader(this.gl.VERTEX_SHADER);
+			shader = this.gl.createShader(this.gl.VERTEX_SHADER);
 		} else {
-		  return null;
+			return null;
 		}
 
 		this.gl.shaderSource(shader, str);
 		this.gl.compileShader(shader);
 
 		if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-		  alert(this.gl.getShaderInfoLog(shader));
-		  return null;
+			alert(this.gl.getShaderInfoLog(shader));
+			return null;
 		}
 
 		return shader;
@@ -138,7 +149,7 @@ ModelViewer.prototype = {
 		this.gl.linkProgram(this.shaderProgram);
 
 		if (!this.gl.getProgramParameter(this.shaderProgram, this.gl.LINK_STATUS)) {
-		  alert("Could not initialise shaders");
+			alert("Could not initialise shaders");
 		}
 
 		this.gl.useProgram(this.shaderProgram);
@@ -160,7 +171,7 @@ ModelViewer.prototype = {
 	},
 
 	glStart: function () {
-		var canvas = document.getElementById("gl");
+		var canvas = this.opt.glCanvas;
 		canvas.width = this.width;
 		canvas.height = this.height;
 
@@ -176,6 +187,7 @@ ModelViewer.prototype = {
 	
 	start: function () {
 		this.stopped = false;
+		this.angleSpeed.Z = 0.01;
 		this.drawScene();
 		this.opt.playBtn.setAttribute('class', 'icon-pause');
 		return true;
@@ -183,6 +195,7 @@ ModelViewer.prototype = {
 	
 	stop: function () {
 		this.stopped = true;
+		this.angleSpeed.Z = 0;
 		this.opt.playBtn.setAttribute('class', 'icon-play');
 		return true;
 	},
@@ -256,10 +269,3 @@ ModelViewer.prototype = {
 		this.glStart();
 	}
 };
-
-addEventListener('load', function () {
-	new ModelViewer({
-		file: 'assets/Item/Objectcomponents/weapon/axe_1h_blacksmithing_d_01.m2',
-		playBtn: document.getElementById('play')
-	});
-});
