@@ -129,7 +129,6 @@ M2.prototype = {
 				var m2 = this.binary.getContext(1);
 				var num = this.binary.read('uint32');
 				var views = [];
-				num = 1; // fix
 				for (var i = 0; i < num; ++i) {
 					m2.pushRequest();
 					(function (i, filename) {
@@ -335,7 +334,7 @@ M2.prototype = {
 
 	load: function (filename) {
 		var that = this;
-//		console.log(filename);
+
 		jBinary.load(filename, this.typeSet, function (err, binary) { 
 			if (err) throw err;
 			that.pushRequest();

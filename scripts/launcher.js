@@ -33,25 +33,38 @@ addEventListener('load', function () {
 	var lastCoords = null,
 		sizeMappings = {X: 'width', Y: 'height'};
 
-	document.addEventListener('mousedown', function (event) {
-		lastCoords = {Y: event.clientX, X: event.clientY};
-		event.preventDefault();
-	});
+	function getCoords(data) {
+		return {X: data.clientY, Y: data.clientX};
+	}
 
-	document.addEventListener('mouseup', function (event) {
+	function onDown(data) {
+		lastCoords = getCoords(data);
+	}
+
+	function onUp() {
 		lastCoords = null;
-	});
+	}
 
-	document.addEventListener('mousemove', function (event) {
+	function onMove(data) {
 		if (!lastCoords) return;
 		
-		var newCoords = {Y: event.clientX, X: event.clientY};
+		var newCoords = getCoords(data);
 
 		for (var name in newCoords) {
-			console.log(name, (newCoords[name] - lastCoords[name]) / viewer[sizeMappings[name]]);
 			viewer.angle[name] += (newCoords[name] - lastCoords[name]) / viewer[sizeMappings[name]] * 4;
 		}
 
 		lastCoords = newCoords;
+	}
+
+	canvas.addEventListener('mousedown', function (event) {
+		onDown(event);
+		event.preventDefault();
 	});
+	canvas.addEventListener('mouseup',   onUp);
+	canvas.addEventListener('mousemove', onMove);
+
+	canvas.addEventListener('touchstart', function (event) { onDown(event.touches[0]) });
+	canvas.addEventListener('touchend',   onUp);
+	canvas.addEventListener('touchmove',  function (event) { onMove(event.touches[0]) });
 });
