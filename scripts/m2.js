@@ -4,7 +4,7 @@ var M2 = function (filename, callback, description_entry) {
 	this.description_entry = description_entry || 'm2';
 	this.load(filename, callback);
 	this.requestCount = 0;
-}
+};
 
 M2.prototype = {
 	typeSet: {

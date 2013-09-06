@@ -9,7 +9,7 @@
 		window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
 	}
 
-	if (!window.requestAnimationFrame)
+	if (!window.requestAnimationFrame) {
 		window.requestAnimationFrame = function(callback, element) {
 			currTime = new Date().getTime();
 			timeToCall = Math.max(0, 16 - (currTime - lastTime));
@@ -17,12 +17,14 @@
 			return window.setTimeout(function() { callback(currTime + timeToCall); }, 
 				timeToCall);
 		};
+	}
 
-		if (!window.cancelAnimationFrame)
-			window.cancelAnimationFrame = function(id) {
-				clearTimeout(id);
-			};
-		}());
+	if (!window.cancelAnimationFrame) {
+		window.cancelAnimationFrame = function(id) {
+			clearTimeout(id);
+		};
+	}
+}());
 
 var ModelViewer = function (opt) {
 	this.opt = opt;

@@ -29,4 +29,29 @@ addEventListener('load', function () {
 				break;
 		}
 	});
+
+	var lastCoords = null,
+		sizeMappings = {X: 'width', Y: 'height'};
+
+	document.addEventListener('mousedown', function (event) {
+		lastCoords = {Y: event.clientX, X: event.clientY};
+		event.preventDefault();
+	});
+
+	document.addEventListener('mouseup', function (event) {
+		lastCoords = null;
+	});
+
+	document.addEventListener('mousemove', function (event) {
+		if (!lastCoords) return;
+		
+		var newCoords = {Y: event.clientX, X: event.clientY};
+
+		for (var name in newCoords) {
+			console.log(name, (newCoords[name] - lastCoords[name]) / viewer[sizeMappings[name]]);
+			viewer.angle[name] += (newCoords[name] - lastCoords[name]) / viewer[sizeMappings[name]] * 4;
+		}
+
+		lastCoords = newCoords;
+	});
 });
