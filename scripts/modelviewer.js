@@ -32,7 +32,7 @@ var ModelViewer = function (opt) {
 	this.pMatrix = mat4.create();
 	this.mvMatrix = mat4.create();
 	
-	this.eye = vec3.create([0.0, -1.0, -0.2]);
+	this.eye = vec3.create([0.0, -1.0, -0.1]);
 	this.center = vec3.create([0.2, 3.2, 0.2]);
 	this.up = vec3.create([0, 0, 1]);
 	
