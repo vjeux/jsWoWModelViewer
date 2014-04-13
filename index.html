@@ -1,80 +1,132 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-	<title>vjeux/jsWoWModelViewer @ GitHub</title>
+	<title>JS WoW Model Viewer</title>
+	<meta name="description" content="JavaScript World of Warcraft model viewer powered by jDataView, jBinary and WebGL" />
+	<meta property="og:image" content="//jdataview.github.io/jsWoWModelViewer/images/modelviewer.png" />
 	
-	<style type="text/css">
+	<!-- Binary Libs -->
+	<script src="//jdataview.github.io/dist/jdataview.js"></script>
+	<script src="//jdataview.github.io/dist/jbinary.js"></script>
+	
+	<!-- WebGL Libs -->
+	<script src="scripts/gl-matrix.js"></script>
+	
+	<!-- Main -->
+	<script src="scripts/m2.js"></script>
+	<script src="scripts/modelviewer.js"></script>
+	<script src="scripts/launcher.js"></script>
+	
+	<script id="shader-vs" type="x-shader/x-vertex"> 
+		attribute vec3 aVertexPosition;
+		attribute vec2 aTextureCoord;
+		
+		uniform mat4 uMVMatrix;
+		uniform mat4 uPMatrix;
+		
+		varying vec3 vLightWeighting;
+		varying vec2 vTextureCoord;
+		
+		void main(void) {
+			gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+		
+			vLightWeighting = aVertexPosition - vec3(-4, 0, 1);
+			vTextureCoord = aTextureCoord;
+		}
+	</script> 
+	
+	<script id="shader-fs" type="x-shader/x-fragment"> 
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+		
+		varying vec3 vLightWeighting;
+		varying vec2 vTextureCoord;
+		uniform sampler2D uSampler;
+		
+		void main(void) {
+			vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+			gl_FragColor = vec4(textureColor.rgb, 1);
+		}
+	</script>
+	 
+	<style>
+		@font-face {
+		  font-family: 'buttons';
+		  	src: url("./font/buttons.eot");
+		  	src: url("./font/buttons.eot?#iefix") format('embedded-opentype'), url("./font/buttons.woff") format('woff'), url("./font/buttons.ttf") format('truetype'), url("./font/buttons.svg#buttons") format('svg');
+		  	font-weight: normal;
+		  	font-style: normal;
+		}
+		[class^="icon-"]:before,
+		[class*=" icon-"]:before {
+		  	font-family: 'buttons';
+		  	font-style: normal;
+		  	font-weight: normal;
+		  	speak: none;
+		  	display: inline-block;
+		  	text-decoration: inherit;
+		  	width: 1em;
+		  	margin-right: 0.2em;
+		  	text-align: center;
+		/* Uncomment for 3D effect */
+			text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3);
+		/* fix buttons height */
+		  	line-height: 1em;
+		/* you can be more comfortable with increased icons size */
+		/* font-size: 120%; */
+		}
+		
+		.icon-pause:before { 
+			content: '\e801';
+			padding: 7px 6px 7px 7px;
+		}
+		.icon-play:before { 
+			content: '\e800';
+			padding: 7px 5px 7px 8px;
+		}
+	
 		body {
-  		margin-top: 1.0em;
-  		background-color: #a123cd;
-		  font-family: "Helvetica,Arial,FreeSans";
-  		color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-		h1 { font-size: 3.8em; color: #5edc32; margin-bottom: 3px; }
-		h1 .small { font-size: 0.4em; }
-		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #5edc32; }
-    h3 { text-align: center; color: #5edc32; }
-    a { color: #5edc32; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
+			margin: 0
+		}
+	
+		#play, #hint {
+			position: absolute;
+			color: #eee;
+			background: transparent;
+			display: inline-block;
+			padding: 0;
+		}
+
+		#play {
+			left: 10px;
+			top: 10px;
+			border: 1px solid #eee;
+			border-radius: 3px;
+			cursor: pointer;
+		}
+
+		#hint {
+			left: 50px;
+			top: 1em;
+		}
+	
+		#gl {
+			width: 100%;
+			height: 100%;
+			border: 0;
+			cursor: default;
+		}
+
+		#gl:active {
+			cursor: move;
+		}
 	</style>
 	
+	<!-- Yandex.Metrika counter --><script type="text/javascript">(function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter23393200 = new Ya.Metrika({id:23393200, webvisor:true, clickmap:true, trackLinks:true, accurateTrackBounce:true, trackHash:true}); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks");</script><noscript><div><img src="//mc.yandex.ru/watch/23393200" style="position:absolute; left:-9999px;" alt="" /></div></noscript><!-- /Yandex.Metrika counter -->
 </head>
-
 <body>
-  <a href="http://github.com/vjeux/jsWoWModelViewer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
-
-  <div id="container">
-
-    <div class="download">
-      <a href="http://github.com/vjeux/jsWoWModelViewer/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/vjeux/jsWoWModelViewer/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
-
-    <h1><a href="http://github.com/vjeux/jsWoWModelViewer">jsWoWModelViewer</a>
-      <span class="small">by <a href="http://github.com/vjeux">vjeux</a></span></h1>
-
-    <div class="description">
-      Display World of Warcraft Models (M2) in WebGL
-    </div>
-
-    <h2>Authors</h2>
-<p>Vjeux (vjeuxx@gmail.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p>Christopher Chedeau (vjeuxx@gmail.com)<br/>      </p>
-
-
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/vjeux/jsWoWModelViewer/zipball/master">zip</a> or
-      <a href="http://github.com/vjeux/jsWoWModelViewer/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/vjeux/jsWoWModelViewer</pre>
-    </p>
-
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/vjeux/jsWoWModelViewer">vjeux/jsWoWModelViewer</a>
-    </div>
-
-  </div>
-
-  
+	<button id="play" class="icon-play"></button><div id="hint">Use your arrow keys and mouse for changing angles.</div>
+	<a href="https://github.com/jDataView/jsWoWModelViewer"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub"></a>
+	<canvas id="gl"></canvas> 
 </body>
 </html>
